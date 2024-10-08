@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 
 const Search = (props) => {
     const [findId, setFindId] = useState('');
@@ -15,10 +16,10 @@ const Search = (props) => {
         event.preventDefault();
 
         // 검색 시 해당 User 정보 반환
-        // await axios.get(`http://localhost:3000/user/${findId}`)
-        //     .then(response => {
-        //         setSearchUser(response.data)
-        //     })
+        await axios.get(`http://localhost:3000/user/${findId}`)
+            .then(response => {
+                setSearchUser(response.data)
+            })
     }
 
     return (
