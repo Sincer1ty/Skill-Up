@@ -38,6 +38,26 @@
             border-radius: 5px; /* 둥근 모서리 */
             background-color: #f0f0f0; /* 배경색 */
         }
+        #boardPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #f9f9f9;
+            border: 2px solid #007bff;
+            padding: 30px;
+            z-index: 1000;
+            border-radius: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        #closeBoardButton {
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            padding: 5px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -47,6 +67,12 @@
         <input type="text" id="userInput" />
         <button id="submitButton">OK</button>
         <button id="cancelButton">Cancel</button>
+    </div>
+
+    <div id = "boardPopup">
+        <h3>게시판</h3>
+        <ul id = "boardList"></ul>
+        <button id = "closeBoardButton">Close</button>
     </div>
 
 <script type="text/javascript">
@@ -77,9 +103,11 @@
     var platform;
     var cursors;
     var sign; // sign 변수를 전역으로 정의
-    //var sign1;
+    var sign1;
     let popupVisible = false;
     let canShowPopup = true; // 팝업을 다시 표시할 수 있는지 여부를 저장하는 변수
+    let popupVisible1 = false;
+    let canShowPopup1 = true;
     
     var game = new Phaser.Game(config);
     
@@ -101,7 +129,7 @@
         this.load.image('sky', 'asset/sky.png');
         this.load.image('ground', 'asset/platform.png');
         this.load.image('sign', 'asset/sign.png');
-        //this.load.image('sign1', 'asset/sign.png');
+        this.load.image('sign1', 'asset/sign.png');
         this.load.spritesheet('dude', 'asset/dude.png',{frameWidth: 32, frameHeight: 48});
     }
 
@@ -122,10 +150,10 @@
         sign.body.setSize(sign.width, sign.height, true);
         sign.body.setOffset(0, -64);
 
-        //sign1 = this.physics.add.staticImage(window.innerWidth * 0.8, window.innerHeight - 32, 'sign'); // sign을 전역 변수로
-        //sign1.setOrigin(0.5, 1);
-        //sign1.body.setSize(sign.width, sign.height, true);
-        //sign1.body.setOffset(0, -64);
+        sign1 = this.physics.add.staticImage(window.innerWidth * 0.8, window.innerHeight - 32, 'sign'); // sign을 전역 변수로
+        sign1.setOrigin(0.5, 1);
+        sign1.body.setSize(sign.width, sign.height, true);
+        sign1.body.setOffset(0, -64);
     
         player = this.physics.add.sprite(100, window.innerHeight - 100, 'dude');
         player.setScale(2);  // player의 크기를 2배로 설정
@@ -161,7 +189,7 @@
         cursors = this.input.keyboard.createCursorKeys();
 
         this.physics.add.overlap(player, sign, overlapSign, null, this);
-        // this.physics.add.overlap(player, sign1, overlapSign, null, this);    
+        this.physics.add.overlap(player, sign1, overlapSign1, null, this);    
     }
 
     function overlapSign(player, sign) {
@@ -183,9 +211,9 @@
             popupVisible = true; // 팝업이 닫힘
             canShowPopup = false; // 팝업이 닫힌 후에는 충돌을 무시
 
-            document.getElementById("userInput").value = '';
-            
-            axios.post('http://localhost:3000/boards', { content:userInput })
+            document.getElementById("userInput").value = ''; //팝업 창에 글을 쓰고 Ok를 누르면 입력 필드가 초기화되게 하는 코드.
+
+            axios.post('http://', { userInput })
                 .then(response => {
                     console.log('Server response:', response.data);
                 })
@@ -204,8 +232,38 @@
         };
     }
 
+    function overlapSign1(player, sign1) {
+        if (popupVisible1) return;
+
+        popupVisible1 = true;
+        canShowPopup1 = false;
+        const popup = document.getElementById("boardPopup");
+        popup.style.display = "block";
+
+        axios.get('')
+            .then(response => {
+                constboardList = document.getElementById("BoardList");
+                boardList.innerHTML = '';
+                response.data.forEach(post => {
+                    const li = document.createElement('li');
+                    li.textContent = post.userInput;
+                    boardList.appendChild(li);
+                })
+            })
+            .catch(error => {
+                console.error('Error fetching board data:', error);
+            })
+        document.getElementById("closeBoardButton").onclick = function() {
+            console.log('Board popup closed.');
+            boardPopup.style.display = "none";
+            popupVisible1 = true;
+            canShowPopup1 = false;
+        }
+    }
+
     function update() {
         const signBounds = sign.getBounds();
+        const signBounds1 = sign1.getBounds();
         const playerBounds = player.getBounds();
         
         // 플레이어가 sign의 영역을 벗어났을 때만 다시 충돌 처리
@@ -217,6 +275,16 @@
             // 플레이어가 sign 영역을 벗어나면 팝업을 다시 표시 가능하도록 설정
             popupVisible = false;
             canShowPopup = true;
+        }
+
+        if (!popupVisible1 && Phaser.Geom.Intersects.RectangleToRectangle(signBounds1, playerBounds)) {
+            if (canShowPopup1) {
+                overlapSign1(player, sign1); // 충돌 시 팝업 표시
+            }
+        } else if (!Phaser.Geom.Intersects.RectangleToRectangle(signBounds1, playerBounds)) {
+            // 플레이어가 sign 영역을 벗어나면 팝업을 다시 표시 가능하도록 설정
+            popupVisible1 = false;
+            canShowPopup1 = true;
         }
     
         if (cursors.left.isDown) {
