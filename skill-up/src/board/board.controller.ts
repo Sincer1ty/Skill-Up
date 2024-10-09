@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { BoardService } from "./board.service";
 import { BoardDto } from "./dto/board.dto";
 
@@ -12,12 +12,14 @@ export class BoardController {
     }
 
     @Get('all')
-    async getAllBoards() {
+    async getAllBoards(
+        @Query('page') page: number,
+        @Query('limit') limit: number,
+    ) {
         console.log("get all Boards");
-        const boards = await this.boardService.getAllBoards(); // boards가 배열인지 확인
+        const [boards, total] = await this.boardService.getAllBoards(page, limit); // boards가 배열인지 확인
         console.log(boards); // 데이터 확인
-        return boards;
-        // return this.boardService.getAllBoards();
+        return {boards, total};
     }
 
     // @Post()
