@@ -32,11 +32,13 @@
         }
         #userInput {
             width: 60%; /* 너비를 80%로 설정 */
-            padding: 0px; /* 내부 여백 설정 */
+            padding: 5px; /* 내부 여백 설정 */
             font-size: 16px; /* 글자 크기 설정 */
             border: 1px solid #007bff; /* 테두리 색상 */
             border-radius: 5px; /* 둥근 모서리 */
             background-color: #f0f0f0; /* 배경색 */
+            user-select: text;
+            white-space: normal;
         }
         #boardPopup {
             display: none;
@@ -64,7 +66,7 @@
 
     <div id="popup">
         <p>아무거나 써보시오.</p>
-        <input type="text" id="userInput" />
+        <input type="text" id="userInput" autocomplete="off" />
         <button id="submitButton">OK</button>
         <button id="cancelButton">Cancel</button>
     </div>
@@ -72,6 +74,9 @@
     <div id = "boardPopup">
         <h3>게시판</h3>
         <ul id = "boardList"></ul>
+        <p id="pageInfo"></p>
+        <button id="prevPageButton">Previous Page</button>
+        <button id="nextPageButton">Next Page</button>
         <button id = "closeBoardButton">Close</button>
     </div>
 
@@ -108,6 +113,8 @@
     let canShowPopup = true; // 팝업을 다시 표시할 수 있는지 여부를 저장하는 변수
     let popupVisible1 = false;
     let canShowPopup1 = true;
+    let currentPage = 1;
+    const itemsPerPage = 10;
     
     var game = new Phaser.Game(config);
     
@@ -201,6 +208,11 @@
         canShowPopup = false;
         const popup = document.getElementById("popup");
         popup.style.display = "block";
+
+        //document.getElementById("userInput").addEventListener("input", function(event) {
+        //    console.log("Current input:", event.target.value);
+        //});
+    
         
         // 'OK' 버튼 클릭 시 처리
         document.getElementById("submitButton").onclick = function() {
@@ -213,7 +225,7 @@
 
             document.getElementById("userInput").value = ''; //팝업 창에 글을 쓰고 Ok를 누르면 입력 필드가 초기화되게 하는 코드.
 
-            axios.post('http://13.125.53.177:3000/boards', { content:userInput })
+            axios.post('http://localhost:3000/boards', { content:userInput })
                 .then(response => {
                     console.log('Server response:', response.data);
                 })
@@ -240,30 +252,65 @@
         const popup = document.getElementById("boardPopup");
         popup.style.display = "block";
     
-        axios.get('http://13.125.53.177:3000/boards/all') // 적절한 URL로 수정
-            .then(response => {
-                const boardList = document.getElementById("boardList"); // ID 확인
-                boardList.innerHTML = '';
-                console.log(response.data);
-                if (Array.isArray(response.data)) { // 배열인지 확인
-                    response.data.forEach(post => {
-                        const li = document.createElement('li');
-                        li.textContent = post.content;
-                        boardList.appendChild(li);
-                    });
-                } else {
-                    console.error('Expected an array but got:', response.data);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching board data:', error);
-            });
-        
+        function fetchBoards(page) {
+            axios.get(`http://13.125.53.177:3000/boards/all?page=${page}&limit=${itemsPerPage}`) // 페이지와 항목 수를 쿼리 파라미터로 전달
+                .then(response => {
+                    const boardList = document.getElementById("boardList"); // ID 확인
+                    boardList.innerHTML = '';
+                    console.log(response.data);
+    
+                    if (Array.isArray(response.data)) {
+                        response.data.forEach(post => {
+                            const li = document.createElement('li');
+                            li.textContent = post.content;
+                            boardList.appendChild(li);
+                        });
+    
+                        // 페이지 네비게이션 버튼 추가
+                        addPaginationButtons(response.totalPages);
+                    } else {
+                        console.error('Expected an array but got:', response.data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching board data:', error);
+                });
+        }
+    
+        function addPaginationButtons(totalPages) {
+            const pagination = document.getElementById("pagination"); // 페이지 버튼을 추가할 요소
+            pagination.innerHTML = ''; // 기존 페이지 버튼 제거
+    
+            // 이전 페이지 버튼
+            if (currentPage > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.textContent = 'Previous';
+                prevButton.onclick = () => {
+                    currentPage--;
+                    fetchBoards(currentPage);
+                };
+                pagination.appendChild(prevButton);
+            }
+    
+            // 다음 페이지 버튼
+            if (currentPage < totalPages) {
+                const nextButton = document.createElement('button');
+                nextButton.textContent = 'Next';
+                nextButton.onclick = () => {
+                    currentPage++;
+                    fetchBoards(currentPage);
+                };
+                pagination.appendChild(nextButton);
+            }
+        }
+    
+        fetchBoards(currentPage);
+    
         document.getElementById("closeBoardButton").onclick = function() {
             console.log('Board popup closed.');
-            popup.style.display = "none"; // 올바른 변수 사용
-            popupVisible1 = true; // 팝업이 닫힌 후에는 충돌을 무시
-            canShowPopup1 = false; // 다시 표시 가능
+            popup.style.display = "none"; // 팝업을 닫음
+            popupVisible1 = true;
+            canShowPopup1 = false;
         };
     }
     function update() {
