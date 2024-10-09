@@ -183,6 +183,8 @@
             popupVisible = true; // 팝업이 닫힘
             canShowPopup = false; // 팝업이 닫힌 후에는 충돌을 무시
 
+            document.getElementById("userInput").value = '';
+            
             axios.post('http://localhost:3000/boards', { content:userInput })
                 .then(response => {
                     console.log('Server response:', response.data);
