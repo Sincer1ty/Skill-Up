@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { BoardDto, BoardStatus } from "./dto/board.dto";
+import { BoardDto } from "./dto/board.dto";
 import { Board, BoardDocument } from "./schemas/board.schema";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
@@ -28,7 +28,7 @@ export class BoardService {
         return await board.save(); // await을 사용하여 비동기적으로 처리
     }
 
-    getAllBoards(): BoardDto[] {
-        return this.boards;
+    async getAllBoards(): Promise<Board[]> {
+        return await this.boardModel.find().exec();
     }
 }

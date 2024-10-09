@@ -12,7 +12,7 @@ export class BoardController {
     }
 
     @Get('all')
-    getAllBoards():BoardDto[]{
+    async getAllBoards() {
         return this.boardService.getAllBoards();
     }
 
