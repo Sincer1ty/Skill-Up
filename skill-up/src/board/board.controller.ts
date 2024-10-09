@@ -13,7 +13,11 @@ export class BoardController {
 
     @Get('all')
     async getAllBoards() {
-        return this.boardService.getAllBoards();
+        console.log("get all Boards");
+        const boards = await this.boardService.getAllBoards(); // boards가 배열인지 확인
+        console.log(boards); // 데이터 확인
+        return boards;
+        // return this.boardService.getAllBoards();
     }
 
     // @Post()

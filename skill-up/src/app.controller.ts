@@ -5,10 +5,11 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+  // @Get()
+  // getHello(): string {
+  //   console.log("Hello world");
+  //   return this.appService.getHello();
+  // }
 }
 
 @Controller('test') //테스트를 위한 컨트롤러
