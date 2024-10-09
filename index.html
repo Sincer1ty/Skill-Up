@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 1</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <style type="text/css">
         body {
             margin: 0;
@@ -182,7 +184,9 @@
             popupVisible = true; // 팝업이 닫힘
             canShowPopup = false; // 팝업이 닫힌 후에는 충돌을 무시
 
-            axios.post('http://localhost:3000/boards', { userInput })
+            document.getElementById("userInput").value = '';
+
+            axios.post('http://localhost:3000/boards', { content:userInput })
                 .then(response => {
                     console.log('Server response:', response.data);
                 })
