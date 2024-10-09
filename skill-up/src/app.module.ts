@@ -4,15 +4,13 @@ import { AppService } from './app.service';
 import { TestMiddleware, TestMiddleware2 } from './middleware/TestMiddleware';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { BoardModule } from './board/board.module';
 import { UserModule } from './user/user.module';
-import { UserController } from './user/user.controller';
-import { UserService } from './user/user.service';
-// import { User } from './user/user.entity';
 
 @Module({
   imports: [ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_URL),
-    UserModule
+    BoardModule
   ],
   controllers: [AppController, TestController],
   providers: [AppService],
