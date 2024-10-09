@@ -1,0 +1,39 @@
+/* src/components/PostForm.css */
+.form-group {
+    margin-bottom: 15px; /* 각 입력 그룹 간의 간격 */
+    display: flex; /* Flexbox를 사용하여 정렬 */
+    align-items: center; /* 라벨과 입력란을 수직 중앙 정렬 */
+  }
+  
+  label {
+    width: 80px; /* 라벨의 너비를 설정 */
+    margin-right: 10px; /* 라벨과 입력란 간의 간격 */
+  }
+  
+  .input-field,
+  .textarea-field {
+    flex: 1; /* 가능한 공간을 모두 차지 */
+    padding: 10px; /* 패딩 추가 */
+    border: 1px solid #ccc; /* 테두리 설정 */
+    border-radius: 4px; /* 모서리 둥글게 */
+    font-size: 16px; /* 글자 크기 설정 */
+  }
+  
+  .textarea-field {
+    height: 100px; /* 텍스트 영역 높이 설정 */
+    resize: none; /* 크기 조정 불가 */
+  }
+  
+  button {
+    padding: 10px 15px; /* 버튼 패딩 */
+    border: none; /* 테두리 없음 */
+    background-color: #007bff; /* 배경색 */
+    color: white; /* 글자색 */
+    border-radius: 4px; /* 버튼 모서리 둥글게 */
+    cursor: pointer; /* 커서 모양 변경 */
+  }
+  
+  button:hover {
+    background-color: #0056b3; /* 버튼 호버 시 색상 변경 */
+  }
+  
