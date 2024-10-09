@@ -246,6 +246,7 @@
     }
 
     function overlapSign1(player, sign1) {
+      
     if (popupVisible1) return;
 
     popupVisible1 = true;
@@ -265,6 +266,7 @@
             .catch(error => {
                 console.error('Error fetching board data:', error);
             });
+
     }
 
     function renderPage(page, data, totalPages) {
