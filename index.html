@@ -244,6 +244,7 @@
             .then(response => {
                 const boardList = document.getElementById("boardList"); // ID 확인
                 boardList.innerHTML = '';
+                console.log(response.data);
                 if (Array.isArray(response.data)) { // 배열인지 확인
                     response.data.forEach(post => {
                         const li = document.createElement('li');
