@@ -12,14 +12,23 @@ export class BoardController {
     }
 
     @Get('all')
-    getAllBoards():BoardDto[]{
+    async getAllBoards() {
         return this.boardService.getAllBoards();
     }
 
+    // @Post()
+    // createBoard(
+    //     @Body('content') content:string,
+    // ): BoardDto {
+    //     console.log("create Board");
+    //     return this.boardService.createBoard(content);
+    // }
     @Post()
-    createBoard(
-        @Body('content') content:string,
-    ): BoardDto {
-        return this.boardService.createBoard(content);
+    async createBoard(
+        @Body() boardDto: BoardDto
+    ) {
+        console.log("create Board");
+        return this.boardService.createBoard(boardDto);
     }
+
 }
