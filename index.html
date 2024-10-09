@@ -213,7 +213,7 @@
 
             document.getElementById("userInput").value = ''; //팝업 창에 글을 쓰고 Ok를 누르면 입력 필드가 초기화되게 하는 코드.
 
-            axios.post('http://localhost:3000/boards', { content:userInput })
+            axios.post('http://13.125.53.177:3000/boards', { content:userInput })
                 .then(response => {
                     console.log('Server response:', response.data);
                 })
@@ -240,7 +240,7 @@
         const popup = document.getElementById("boardPopup");
         popup.style.display = "block";
     
-        axios.get('http://localhost:3000/boards/all') // 적절한 URL로 수정
+        axios.get('http://13.125.53.177:3000/boards/all') // 적절한 URL로 수정
             .then(response => {
                 const boardList = document.getElementById("boardList"); // ID 확인
                 boardList.innerHTML = '';
