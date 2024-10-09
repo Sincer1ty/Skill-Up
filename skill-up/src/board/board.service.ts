@@ -9,16 +9,15 @@ export class BoardService {
         return 'Hello Board!';
     }
 
-    createBoard(title: string, content: string): BoardDto {
+    createBoard(content: string): BoardDto {
         const board: BoardDto = {
-            title,
             content,
             status: BoardStatus.PUBLIC
         };
         this.boards.push(board);
         return board;
     }
-    
+
     getAllBoards(): BoardDto[] {
         return this.boards;
     }

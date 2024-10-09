@@ -1,6 +1,6 @@
 export interface BoardDto {
     // id: string;
-    title: string;
+    // title: string;
     content: string;
     status: BoardStatus;
 }
