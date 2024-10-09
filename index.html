@@ -248,7 +248,7 @@
                 if (Array.isArray(response.data)) { // 배열인지 확인
                     response.data.forEach(post => {
                         const li = document.createElement('li');
-                        li.textContent = post.userInput;
+                        li.textContent = post.content;
                         boardList.appendChild(li);
                     });
                 } else {
