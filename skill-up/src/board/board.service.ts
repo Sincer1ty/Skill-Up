@@ -28,7 +28,12 @@ export class BoardService {
         return await board.save(); // await을 사용하여 비동기적으로 처리
     }
 
-    async getAllBoards(): Promise<Board[]> {
-        return await this.boardModel.find().exec();
+    async getAllBoards(page:number, limit:number): Promise<[Board[], number]> {
+        const skip = (page - 1) * limit;
+        const [data, total] = await Promise.all([
+            this.boardModel.find().skip(skip).limit(limit).exec(),
+            this.boardModel.countDocuments().exec()
+        ]);
+        return [data, total];
     }
 }

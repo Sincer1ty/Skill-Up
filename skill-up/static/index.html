@@ -115,7 +115,8 @@
     let canShowPopup1 = true;
     let currentPage = 1;
     const itemsPerPage = 10;
-    
+    let totalPages;
+
     var game = new Phaser.Game(config);
     
     function resizeGround() {
@@ -245,74 +246,67 @@
     }
 
     function overlapSign1(player, sign1) {
-        if (popupVisible1) return;
-    
-        popupVisible1 = true;
-        canShowPopup1 = false;
-        const popup = document.getElementById("boardPopup");
-        popup.style.display = "block";
-    
-        function fetchBoards(page) {
-            axios.get(`http://13.125.53.177:3000/boards/all?page=${page}&limit=${itemsPerPage}`) // 페이지와 항목 수를 쿼리 파라미터로 전달
-                .then(response => {
-                    const boardList = document.getElementById("boardList"); // ID 확인
-                    boardList.innerHTML = '';
-                    console.log(response.data);
-    
-                    if (Array.isArray(response.data)) {
-                        response.data.forEach(post => {
-                            const li = document.createElement('li');
-                            li.textContent = post.content;
-                            boardList.appendChild(li);
-                        });
-    
-                        // 페이지 네비게이션 버튼 추가
-                        addPaginationButtons(response.totalPages);
-                    } else {
-                        console.error('Expected an array but got:', response.data);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching board data:', error);
-                });
-        }
-    
-        function addPaginationButtons(totalPages) {
-            const pagination = document.getElementById("pagination"); // 페이지 버튼을 추가할 요소
-            pagination.innerHTML = ''; // 기존 페이지 버튼 제거
-    
-            // 이전 페이지 버튼
-            if (currentPage > 1) {
-                const prevButton = document.createElement('button');
-                prevButton.textContent = 'Previous';
-                prevButton.onclick = () => {
-                    currentPage--;
-                    fetchBoards(currentPage);
-                };
-                pagination.appendChild(prevButton);
-            }
-    
-            // 다음 페이지 버튼
-            if (currentPage < totalPages) {
-                const nextButton = document.createElement('button');
-                nextButton.textContent = 'Next';
-                nextButton.onclick = () => {
-                    currentPage++;
-                    fetchBoards(currentPage);
-                };
-                pagination.appendChild(nextButton);
-            }
-        }
-    
-        fetchBoards(currentPage);
-    
-        document.getElementById("closeBoardButton").onclick = function() {
-            console.log('Board popup closed.');
-            popup.style.display = "none"; // 팝업을 닫음
-            popupVisible1 = true;
-            canShowPopup1 = false;
-        };
+      
+    if (popupVisible1) return;
+
+    popupVisible1 = true;
+    canShowPopup1 = false;
+    const popup = document.getElementById("boardPopup");
+    popup.style.display = "block";
+
+    const boardList = document.getElementById("boardList");
+
+    function fetchBoards(page) {
+        axios.get(`http://13.125.53.177:3000/boards/all?page=${page}&limit=${itemsPerPage}`)
+            .then(response => {
+                totalPages = Math.ceil(response.data.total / itemsPerPage); // 총 게시물 수 기반으로 페이지 수 계산
+
+                renderPage(page, response.data.boards, totalPages); // 응답 데이터와 총 페이지 수 전달
+            })
+            .catch(error => {
+                console.error('Error fetching board data:', error);
+            });
+
     }
+
+    function renderPage(page, data, totalPages) {
+        boardList.innerHTML = '';
+
+        data.forEach(post => {
+            const li = document.createElement('li');
+            li.textContent = post.content;
+            boardList.appendChild(li);
+        });
+
+        // 페이지 정보 표시
+        document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
+    }
+
+    // 페이지 이동 버튼 설정
+    document.getElementById("nextPageButton").onclick = function() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            fetchBoards(currentPage); // 새 페이지를 렌더링
+        }
+    };
+
+    document.getElementById("prevPageButton").onclick = function() {
+        if (currentPage > 1) {
+            currentPage--;
+            fetchBoards(currentPage); // 이전 페이지를 렌더링
+        }
+    };
+
+    // 첫 페이지 렌더링
+    fetchBoards(currentPage);
+
+    document.getElementById("closeBoardButton").onclick = function() {
+        console.log('Board popup closed.');
+        popup.style.display = "none"; 
+        popupVisible1 = false; // 팝업이 닫힐 때 false로 설정
+        canShowPopup1 = true; // 다시 팝업을 보여줄 수 있도록 설정
+    };
+}
     function update() {
         const signBounds = sign.getBounds();
         const signBounds1 = sign1.getBounds();
