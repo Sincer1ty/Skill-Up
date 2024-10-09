@@ -213,7 +213,7 @@
 
             document.getElementById("userInput").value = ''; //팝업 창에 글을 쓰고 Ok를 누르면 입력 필드가 초기화되게 하는 코드.
 
-            axios.post('http://', { userInput })
+            axios.post('http://localhost:3000/boards', { userInput })
                 .then(response => {
                     console.log('Server response:', response.data);
                 })
