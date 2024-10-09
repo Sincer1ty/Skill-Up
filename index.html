@@ -240,7 +240,7 @@
         const popup = document.getElementById("boardPopup");
         popup.style.display = "block";
 
-        axios.get('')
+        axios.get('http://localhost:3000/boards/all')
             .then(response => {
                 constboardList = document.getElementById("BoardList");
                 boardList.innerHTML = '';
